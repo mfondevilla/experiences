@@ -11,21 +11,14 @@ final class Experience
         private string $providerId
     ) {}
 
-    public static function create(
-        ExperienceId $id,
-        string $title,
-        string $description,
-        string $providerId
-    ): self {
-        if ($title === '') {
-            throw new \InvalidArgumentException('Title cannot be empty');
-        }
-
-        if ($providerId === '') {
-            throw new \InvalidArgumentException('ProviderId cannot be empty');
-        }
-
-        return new self($id, $title, $description, $providerId);
+    public static function create(string $title, string $description, string $providerId): self
+    {
+        return new self(
+            ExperienceId::generate(),
+            $title,
+            $description,
+            $providerId
+        );
     }
 
     public function id(): ExperienceId

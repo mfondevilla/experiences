@@ -8,17 +8,18 @@ use App\Domain\Experience\ExperienceRepository;
 
 final class RegisterExperienceHandler
 {
-    public function __construct(private ExperienceRepository $repository) {}
+    public function __construct(
+        private ExperienceRepository $repository
+    ) {}
 
     public function __invoke(RegisterExperienceCommand $command): void
     {
         $experience = Experience::create(
-            ExperienceId::generate(),
             $command->title,
             $command->description,
             $command->providerId
         );
 
-        $repository->save($experience);
+        $this->repository->save($experience);
     }
 }

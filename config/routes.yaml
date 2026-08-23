@@ -7,5 +7,22 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
-controllers:
-    resource: routing.controllers
+experience_register:
+    path: /experiences
+    controller: App\Infrastructure\Http\Controller\ExperienceController::register
+    methods: [POST]
+
+session_create:
+    path: /sessions
+    controller: App\Infrastructure\Http\Controller\SessionController::create
+    methods: [POST]
+
+reservation_reserve:
+    path: /reservations
+    controller: App\Infrastructure\Http\Controller\ReservationController::reserve
+    methods: [POST]
+
+reservation_cancel:
+    path: /reservations/{id}/cancel
+    controller: App\Infrastructure\Http\Controller\ReservationController::cancel
+    methods: [POST]

@@ -18,6 +18,17 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+    
+    App\Application\:
+        resource: '../src/Application/'
+
+    App\Infrastructure\Http\Controller\:
+        resource: '../src/Infrastructure/Http/Controller'
+        tags: ['controller.service_arguments']
+
+    App\Infrastructure\Persistence\Doctrine\:
+        resource: '../src/Infrastructure/Persistence/Doctrine/'
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
