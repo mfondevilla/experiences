@@ -7,24 +7,25 @@ use App\Domain\Reservation\ReservationId;
 use App\Domain\Reservation\ReservationRepository;
 use App\Domain\Reservation\UserId; 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ReservationDoctrineRepository implements ReservationRepository
+class ReservationDoctrineRepository extends ServiceEntityRepository implements ReservationRepository
 {
-    public function __construct(private EntityManagerInterface $em)
+    
+    public function __construct(ManagerRegistry $registry)
     {
+        parent::__construct($registry, ReservationModel::class);
     }
 
     public function save(Reservation $reservation): void
     {
-         // Buscar si ya existe el modelo en el EntityManager
-        $model = $this->em->find(ReservationModel::class, $reservation->id()->value());
+        $model = $this->find($reservation->id()->value());
 
         if ($model === null) {
-            // Si no existe, creamos uno nuevo desde la entidad de dominio
             $model = ReservationModel::fromDomain($reservation);
-            $this->em->persist($model);
+            $this->getEntityManager()->persist($model);
         } else {
-            // Si ya existe, actualizamos sus campos
             $model->sessionId = $reservation->sessionId();
             $model->userId = $reservation->userId()->value();
             $model->seats = $reservation->seats();
@@ -33,33 +34,28 @@ class ReservationDoctrineRepository implements ReservationRepository
             $model->createdAt = $reservation->createdAt();
         }
 
-        $this->em->flush();
+        $this->getEntityManager()->flush();
     }
 
-    public function find(ReservationId $id): ?Reservation
+    public function findDomain(ReservationId $id): ?Reservation
     {
-        $model = $this->em->getRepository(ReservationModel::class)
-            ->find($id->value());
-
-        if (!$model) {
-            return null;
-        }
-
-        return $model->toDomain();
+        $model = $this->em->find(ReservationModel::class, $id->value());
+        return $model?->toDomain();
     }
-
+/*
     public function findBySession(string $sessionId): array
     {
-        $models = $this->em->getRepository(ReservationModel::class)
-            ->findBy(['sessionId' => $sessionId]);
-
-        return array_map(fn(ReservationModel $m) => $m->toDomain(), $models);
-    }
-
+        $model = parent::find($id->value());
+        return $model?->toDomain();
+    }*/
+      
     public function findByUser(UserId $userId): array
     {
-        $models = $this->em->getRepository(ReservationModel::class)
-            ->findBy(['userId' => $userId->value()]); // 👈 convertir VO a string
+        $models = $this->createQueryBuilder('r')
+            ->where('r.userId = :uid')
+            ->setParameter('uid', $userId->value())
+            ->getQuery()
+            ->getResult();
 
         return array_map(fn(ReservationModel $m) => $m->toDomain(), $models);
     }

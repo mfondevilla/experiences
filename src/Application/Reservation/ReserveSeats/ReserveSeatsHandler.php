@@ -18,10 +18,9 @@ final class ReserveSeatsHandler
 
     public function __invoke(ReserveSeatsCommand $command): ReservationId
     {
+        $sessionId = SessionId::fromString($command->sessionId);
         // 1. Recuperamos la sesión desde el repositorio
-        $session = $this->sessionRepository->find(
-            SessionId::fromString($command->sessionId)
-        );
+        $session = $this->sessionRepository->findDomain($sessionId);       
 
         if ($session === null) {
             throw new \RuntimeException('Session not found: ' . $command->sessionId);

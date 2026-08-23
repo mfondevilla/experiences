@@ -40,18 +40,12 @@ class SessionDoctrineRepository extends ServiceEntityRepository implements Sessi
         $this->em->flush();
     }
 
-   /* public function find(SessionId $id): ?Session
+    public function findDomain(SessionId $id): ?Session
     {
-        $model = $this->em->getRepository(SessionModel::class)
-            ->find($id->value());
-
-        if (!$model) {
-            return null;
-        }
-
-        return $model->toDomain();
+        $model = parent::find($id->value());
+        return $model?->toDomain();
     }
-*/
+
     public function findByExperienceAndDate(ExperienceId $experienceId, \DateTimeImmutable $date): ?Session
     {
         $qb = $this->createQueryBuilder('s');
