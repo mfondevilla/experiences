@@ -26,6 +26,12 @@ final class ReserveSeatsHandler
         if ($session === null) {
             throw new \RuntimeException('Session not found: ' . $command->sessionId);
         }
+        
+        $now = new \DateTimeImmutable();
+
+        if ($session->startAt() <= $now) {
+            throw new \DomainException('Cannot reserve a session that has already started');
+        }
 
         // 2. Generamos un nuevo ReservationId
         $reservationId = ReservationId::generate();

@@ -21,7 +21,7 @@ class ReservationTest extends WebTestCase
         // 1️⃣ Crear una sesión válida para el test
         $session = Session::create(
             experienceId: 'experience-123',
-            startAt: '2026-08-23 19:00:00',
+            startAt: '2026-09-25 19:00:00',
             capacity: 10,
             price: 20.0
         );
