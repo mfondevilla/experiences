@@ -14,7 +14,14 @@ final class Session
         private int $capacity,
         private float $price,
         private int $availableSeats
-    ) {}
+    ) {
+        $this->id = $id;
+        $this->experienceId = $experienceId;
+        $this->startAt = $startAt;   
+        $this->capacity = $capacity;
+        $this->price = $price;
+        $this->availableSeats = $availableSeats;
+    }
 
     public function reserveSeats(int $seats): void
     {
@@ -35,6 +42,11 @@ final class Session
         int $capacity,
         float $price
     ): self {
+        $date = new \DateTimeImmutable($startAt);
+
+        if ($date < new \DateTimeImmutable('today')) {
+            throw new \DomainException('Cannot create a session in the past');
+        }
         return new self(
             SessionId::generate(),
             ExperienceId::fromString($experienceId),
