@@ -2,10 +2,12 @@
 
 namespace App\Infrastructure\Persistence\Doctrine;
 
+use App\Domain\Experience\ExperienceId; 
 use App\Domain\Session\Session;
 use App\Domain\Session\SessionId;
 use App\Domain\Session\SessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+
 
 class SessionDoctrineRepository implements SessionRepository
 {
@@ -45,11 +47,15 @@ class SessionDoctrineRepository implements SessionRepository
         return $model->toDomain();
     }
 
-    public function findByExperience(string $experienceId): array
+    public function findByExperienceAndDate(ExperienceId $experienceId, \DateTimeImmutable $date): ?Session
     {
-        $models = $this->em->getRepository(SessionModel::class)
-            ->findBy(['experienceId' => $experienceId]);
-
-        return array_map(fn(SessionModel $m) => $m->toDomain(), $models);
+        return $this->createQueryBuilder('s')
+            ->where('s.experienceId = :exp')
+            ->andWhere('DATE(s.startAt) = :day')
+            ->setParameter('exp', $experienceId->value())
+            ->setParameter('day', $date->format('Y-m-d'))
+            ->getQuery()
+            ->getOneOrNullResult();
     }
+
 }

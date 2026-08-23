@@ -15,6 +15,15 @@ final class CreateSessionHandler
 
     public function __invoke(CreateSessionCommand $command): void
     {
+        $existing = $this->repository->findByExperienceAndDate(
+            ExperienceId::fromString($command->experienceId),
+            new \DateTimeImmutable($command->startAt)
+        );
+
+        if ($existing !== null) {
+            throw new \DomainException('A session for this experience already exists on this date');
+        }
+        
         $session = Session::create(
             $command->experienceId,
             $command->startAt,

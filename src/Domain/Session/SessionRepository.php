@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domain\Session;
+use App\Domain\Experience\ExperienceId; 
 
 interface SessionRepository
 {
@@ -9,5 +10,6 @@ interface SessionRepository
     public function find(SessionId $id): ?Session;
 
     /** Opcional si necesitas listar sesiones por experiencia */
-    public function findByExperience(string $experienceId): array;
+    public function findByExperienceAndDate(ExperienceId $experienceId, \DateTimeImmutable $date): ?Session;
+
 }
