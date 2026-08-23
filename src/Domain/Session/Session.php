@@ -16,6 +16,19 @@ final class Session
         private int $availableSeats
     ) {}
 
+    public function reserveSeats(int $seats): void
+    {
+        if ($seats <= 0) {
+            throw new \InvalidArgumentException('Seats must be greater than zero');
+        }
+
+        if ($seats > $this->availableSeats) {
+            throw new \RuntimeException('Not enough seats available');
+        }
+
+        $this->availableSeats -= $seats;
+    }
+    
     public static function create(
         string $experienceId,
         string $startAt,
@@ -31,6 +44,26 @@ final class Session
             $capacity
         );
     }
+
+    // TODO DOCUMENTAR
+    public static function fromPrimitives(
+        string $id,
+        string $experienceId,
+        \DateTimeImmutable $startAt,
+        int $capacity,
+        float $price,
+        int $availableSeats
+    ): self {
+        return new self(
+            SessionId::fromString($id),
+            ExperienceId::fromString($experienceId),
+            $startAt,
+            $capacity,
+            $price,
+            $availableSeats
+        );
+    }
+
 
     public function id(): SessionId
     {

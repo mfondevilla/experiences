@@ -45,13 +45,36 @@ class SessionModel
 
     public function toDomain(): Session
     {
-        return new Session(
-            SessionId::fromString($this->id),
-            ExperienceId::fromString($this->experienceId),
+        //TODO Docuemntar
+        return Session::fromPrimitives(
+            $this->id,
+            $this->experienceId,
             $this->startAt,
             $this->capacity,
             $this->price,
             $this->availableSeats
-        );
+    );
     }
+
+     // --- Setters públicos ---
+    public function setExperienceId(string $experienceId): void
+    {
+        $this->experienceId = $experienceId;
+    }
+        public function setAvailableSeats(int $availableSeats): void
+    {
+        $this->availableSeats = $availableSeats;
+    }
+
+    public function setPrice(float $price): void
+    {
+        $this->price = $price;
+    }
+
+    public function setStartAt(\DateTimeImmutable $startAt): void
+    {
+        $this->startAt = $startAt;
+    }
+
+ 
 }

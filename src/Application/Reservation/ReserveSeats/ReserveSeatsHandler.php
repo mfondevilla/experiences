@@ -2,11 +2,12 @@
 
 namespace App\Application\Reservation\ReserveSeats;
 
+use App\Domain\Session\SessionId;
+use App\Domain\Session\SessionRepository;
 use App\Domain\Reservation\Reservation;
 use App\Domain\Reservation\ReservationId;
 use App\Domain\Reservation\UserId;
 use App\Domain\Reservation\ReservationRepository;
-use App\Domain\Session\SessionRepository;
 
 final class ReserveSeatsHandler
 {
@@ -17,16 +18,30 @@ final class ReserveSeatsHandler
 
     public function __invoke(ReserveSeatsCommand $command): void
     {
-        $session = $sessionRepository->find(SessionId::fromString($command->sessionId));
+        // 1. Recuperamos la sesión desde el repositorio
+        $session = $this->sessionRepository->find(
+            SessionId::fromString($command->sessionId)
+        );
 
+        if ($session === null) {
+            throw new \RuntimeException('Session not found: ' . $command->sessionId);
+        }
+
+        // 2. Generamos un nuevo ReservationId
+        $reservationId = ReservationId::generate();
+
+        // 3. Creamos la reserva con objetos de dominio
         $reservation = Reservation::create(
-            ReservationId::generate(),
+            $reservationId,
             $session,
             UserId::fromString($command->userId),
             $command->seats
         );
 
-        $reservationRepository->save($reservation);
-        $sessionRepository->save($session); // seats updated
+        // 4. Guardamos la reserva
+        $this->reservationRepository->save($reservation);
+
+        // 5. Actualizamos la sesión (ya se reduce seats en Reservation::create())
+        $this->sessionRepository->save($session);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Session;
 
+use App\Domain\Session\SessionId;
 use InvalidArgumentException;
 
 final class SessionId

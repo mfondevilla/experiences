@@ -2,9 +2,11 @@
 
 namespace App\Domain\Reservation;
 
+use App\Domain\Reservation\ReservationId;
+use App\Domain\Reservation\UserId;
+use App\Domain\Reservation\ReservationStatus;
 use App\Domain\Session\Session;
 use DateTimeImmutable;
-use InvalidArgumentException;
 
 final class Reservation
 {
@@ -18,6 +20,7 @@ final class Reservation
         private DateTimeImmutable $createdAt
     ) {}
 
+    // Crear nueva reserva con validación y cálculo de precio
     public static function create(
         ReservationId $id,
         Session $session,
@@ -25,9 +28,10 @@ final class Reservation
         int $seats
     ): self {
         if ($seats <= 0) {
-            throw new InvalidArgumentException('Seats must be greater than zero');
+            throw new \InvalidArgumentException('Seats must be greater than zero');
         }
 
+        // Actualiza la sesión (reduce asientos disponibles)
         $session->reserveSeats($seats);
 
         $totalPrice = $session->price() * $seats;
@@ -38,29 +42,30 @@ final class Reservation
             $userId,
             $seats,
             $totalPrice,
-            ReservationStatus::CONFIRMED,
-            new DateTimeImmutable()
+            ReservationStatus::CONFIRMED,   // 👈 estado inicial
+            new DateTimeImmutable()         // 👈 fecha de creación
         );
     }
 
-    public function cancel(Session $session): void
-    {
-        if ($this->status === ReservationStatus::CANCELLED) {
-            throw new InvalidArgumentException('Reservation already cancelled');
-        }
-
-        $now = new DateTimeImmutable();
-        $sessionStart = $session->startAt();
-
-        $diff = $sessionStart->getTimestamp() - $now->getTimestamp();
-
-        if ($diff < 24 * 3600) {
-            throw new InvalidArgumentException('Cannot cancel reservation less than 24 hours before the session');
-        }
-
-        $this->status = ReservationStatus::CANCELLED;
-
-        $session->releaseSeats($this->seats);
+    // Reconstruir desde la base de datos
+    public static function fromPrimitives(
+        string $id,
+        string $sessionId,
+        string $userId,
+        int $seats,
+        float $totalPrice,
+        string $status,
+        string $createdAt
+    ): self {
+        return new self(
+            ReservationId::fromString($id),
+            $sessionId,
+            UserId::fromString($userId),
+            $seats,
+            $totalPrice,
+            ReservationStatus::from($status),
+            new DateTimeImmutable($createdAt)
+        );
     }
 
     public function id(): ReservationId { return $this->id; }
@@ -69,4 +74,8 @@ final class Reservation
     public function seats(): int { return $this->seats; }
     public function totalPrice(): float { return $this->totalPrice; }
     public function status(): ReservationStatus { return $this->status; }
+    public function createdAt(): DateTimeImmutable { return $this->createdAt; }
+
+    public function markCancelled(): void { $this->status = ReservationStatus::CANCELLED; }
+    public function markConfirmed(): void { $this->status = ReservationStatus::CONFIRMED; }
 }

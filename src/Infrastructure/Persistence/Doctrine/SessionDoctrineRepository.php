@@ -15,9 +15,21 @@ class SessionDoctrineRepository implements SessionRepository
 
     public function save(Session $session): void
     {
-        $model = SessionModel::fromDomain($session);
+       // Buscar si ya existe en el EntityManager
+        $model = $this->em->find(SessionModel::class, $session->id()->value());
 
-        $this->em->persist($model);
+        if ($model === null) {
+            // Si no existe, creamos uno nuevo
+            $model = SessionModel::fromDomain($session);
+            $this->em->persist($model);
+        } else {
+            // Si existe, actualizamos sus campos
+            $model->setExperienceId($session->experienceId()->value());
+            $model->setAvailableSeats($session->availableSeats());
+            $model->setPrice($session->price());
+            $model->setStartAt($session->startAt());
+        }
+
         $this->em->flush();
     }
 
