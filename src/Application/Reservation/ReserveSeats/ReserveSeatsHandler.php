@@ -16,7 +16,7 @@ final class ReserveSeatsHandler
         private ReservationRepository $reservationRepository
     ) {}
 
-    public function __invoke(ReserveSeatsCommand $command): void
+    public function __invoke(ReserveSeatsCommand $command): ReservationId
     {
         // 1. Recuperamos la sesión desde el repositorio
         $session = $this->sessionRepository->find(
@@ -43,5 +43,7 @@ final class ReserveSeatsHandler
 
         // 5. Actualizamos la sesión (ya se reduce seats en Reservation::create())
         $this->sessionRepository->save($session);
+
+        return $reservationId;
     }
 }

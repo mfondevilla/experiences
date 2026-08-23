@@ -2,10 +2,12 @@
 
 namespace App\Infrastructure\Http\Controller;
 
+use App\Domain\Reservation\ReservationId;
 use App\Application\Reservation\ReserveSeats\ReserveSeatsCommand;
 use App\Application\Reservation\ReserveSeats\ReserveSeatsHandler;
 use App\Application\Reservation\CancelReservation\CancelReservationCommand;
 use App\Application\Reservation\CancelReservation\CancelReservationHandler;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,7 +30,12 @@ final class ReservationController
 
         ($this->reserveHandler)($command);
 
-        return new JsonResponse(['status' => 'ok']);
+        $reservationId = ($this->reserveHandler)($command);
+        return new JsonResponse([
+            'reservationId' => $reservationId->value(),
+            'status' => 'ok'
+        ]);
+
     }
 
     public function cancel(string $id): JsonResponse
@@ -37,6 +44,9 @@ final class ReservationController
 
         ($this->cancelHandler)($command);
 
-        return new JsonResponse(['status' => 'ok']);
+        return $this->json([
+            'reservationId' => $reservationId->value(),
+            'status' => 'ok'
+        ]);
     }
 }

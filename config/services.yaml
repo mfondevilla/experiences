@@ -29,6 +29,7 @@ services:
     App\Infrastructure\Persistence\Doctrine\:
         resource: '../src/Infrastructure/Persistence/Doctrine/'
 
-
+    App\Infrastructure\Email\:
+        resource: '../src/Infrastructure/Email/'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

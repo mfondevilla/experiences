@@ -26,3 +26,5 @@ reservation_cancel:
     path: /reservations/{id}/cancel
     controller: App\Infrastructure\Http\Controller\ReservationController::cancel
     methods: [POST]
+
+
