@@ -42,8 +42,8 @@ final class Reservation
             $userId,
             $seats,
             $totalPrice,
-            ReservationStatus::CONFIRMED,   // 👈 estado inicial
-            new DateTimeImmutable()         // 👈 fecha de creación
+            ReservationStatus::CONFIRMED,   
+            new DateTimeImmutable()         
         );
     }
 

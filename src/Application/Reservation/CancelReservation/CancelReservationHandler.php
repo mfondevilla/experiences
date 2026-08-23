@@ -35,7 +35,8 @@ final class CancelReservationHandler
 
         // Regla de negocio: cancelar reserva y devolver plazas
         $reservation->markCancelled();
-
+        $session->releaseSeats($reservation->seats());
+        
         // Persistir cambios
         $this->reservationRepository->save($reservation);
         $this->sessionRepository->save($session);
