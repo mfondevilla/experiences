@@ -9,18 +9,19 @@ use DateTimeImmutable;
 
 final class CreateSessionHandler
 {
-    public function __construct(private SessionRepository $repository) {}
+    public function __construct(
+        private SessionRepository $repository
+    ) {}
 
     public function __invoke(CreateSessionCommand $command): void
     {
         $session = Session::create(
-            SessionId::generate(),
             $command->experienceId,
-            new DateTimeImmutable($command->startAt),
+            $command->startAt,
             $command->capacity,
             $command->price
         );
 
-        $repository->save($session);
+        $this->repository->save($session); 
     }
 }

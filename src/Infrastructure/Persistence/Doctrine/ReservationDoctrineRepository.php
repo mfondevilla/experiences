@@ -22,7 +22,7 @@ final class ReservationDoctrineRepository implements ReservationRepository
         $model->userId = $reservation->userId()->value();
         $model->seats = $reservation->seats();
         $model->totalPrice = $reservation->totalPrice();
-        $model->status = $reservation->status()->value;
+        $model->status = $reservation->status()->value();
         $model->createdAt = $reservation->createdAt();
 
         $this->em->persist($model);

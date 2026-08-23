@@ -2,68 +2,73 @@
 
 namespace App\Domain\Session;
 
-use DateTimeImmutable;
-use InvalidArgumentException;
+use App\Domain\Session\SessionId;
+use App\Domain\Experience\ExperienceId;
 
 final class Session
 {
     private function __construct(
         private SessionId $id,
-        private string $experienceId,
-        private DateTimeImmutable $startAt,
+        private ExperienceId $experienceId,
+        private \DateTimeImmutable $startAt,
         private int $capacity,
-        private int $availableSeats,
-        private float $price
+        private float $price,
+        private int $availableSeats
     ) {}
 
     public static function create(
-        SessionId $id,
         string $experienceId,
-        DateTimeImmutable $startAt,
+        string $startAt,
         int $capacity,
         float $price
     ): self {
-        if ($capacity <= 0) {
-            throw new InvalidArgumentException('Capacity must be greater than zero');
-        }
-
-        if ($startAt < new DateTimeImmutable()) {
-            throw new InvalidArgumentException('Cannot create a session in the past');
-        }
-
-        return new self($id, $experienceId, $startAt, $capacity, $capacity, $price);
+        return new self(
+            SessionId::generate(),
+            ExperienceId::fromString($experienceId),
+            new \DateTimeImmutable($startAt),
+            $capacity,
+            $price,
+            $capacity
+        );
     }
 
-    public function reserveSeats(int $seats): void
+    public function id(): SessionId
     {
-        if ($this->startAt < new DateTimeImmutable()) {
-            throw new InvalidArgumentException('Cannot reserve seats for a session that has already started');
-        }
+        return $this->id;
+    }
 
-        if ($seats <= 0) {
-            throw new InvalidArgumentException('Seats must be greater than zero');
-        }
+    public function experienceId(): ExperienceId
+    {
+        return $this->experienceId;
+    }
 
-        if ($seats > $this->availableSeats) {
-            throw new InvalidArgumentException('Not enough available seats');
-        }
+    public function startAt(): \DateTimeImmutable
+    {
+        return $this->startAt;
+    }
 
+    public function capacity(): int
+    {
+        return $this->capacity;
+    }
+
+    public function price(): float
+    {
+        return $this->price;
+    }
+
+    public function availableSeats(): int
+    {
+        return $this->availableSeats;
+    }
+
+    public function decreaseSeats(int $seats): void
+    {
         $this->availableSeats -= $seats;
     }
 
-    public function releaseSeats(int $seats): void
+    public function increaseSeats(int $seats): void
     {
         $this->availableSeats += $seats;
-
-        if ($this->availableSeats > $this->capacity) {
-            $this->availableSeats = $this->capacity;
-        }
     }
-
-    public function id(): SessionId { return $this->id; }
-    public function experienceId(): string { return $this->experienceId; }
-    public function startAt(): DateTimeImmutable { return $this->startAt; }
-    public function capacity(): int { return $this->capacity; }
-    public function availableSeats(): int { return $this->availableSeats; }
-    public function price(): float { return $this->price; }
 }
