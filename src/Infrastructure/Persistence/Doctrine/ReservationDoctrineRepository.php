@@ -39,7 +39,7 @@ class ReservationDoctrineRepository extends ServiceEntityRepository implements R
 
     public function findDomain(ReservationId $id): ?Reservation
     {
-        $model = $this->em->find(ReservationModel::class, $id->value());
+        $model = parent::find($id->value()); // ✔ string
         return $model?->toDomain();
     }
 /*

@@ -8,10 +8,11 @@ use App\Application\Reservation\ReserveSeats\ReserveSeatsHandler;
 use App\Application\Reservation\CancelReservation\CancelReservationCommand;
 use App\Application\Reservation\CancelReservation\CancelReservationHandler;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ReservationController
+final class ReservationController extends AbstractController    
 {
     public function __construct(
         private ReserveSeatsHandler $reserveHandler,

@@ -35,6 +35,15 @@ final class Session
 
         $this->availableSeats -= $seats;
     }
+
+    public function releaseSeats(int $seats): void
+    {
+        if ($seats <= 0) {
+            throw new \InvalidArgumentException('Seats must be greater than zero');
+        }
+
+        $this->availableSeats += $seats;
+    }
     
     public static function create(
         string $experienceId,

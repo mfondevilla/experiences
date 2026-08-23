@@ -17,15 +17,15 @@ final class CancelReservationHandler
     public function __invoke(CancelReservationCommand $command): void
     { 
         // Usar las propiedades del constructor con $this->
-        $reservation = $this->reservationRepository->find(
-            ReservationId::fromString($command->reservationId)
-        );
+        $reservationId = ReservationId::fromString($command->reservationId);
+
+        $reservation = $this->reservationRepository->findDomain($reservationId);
 
         if (!$reservation) {
             throw new \RuntimeException('Reservation not found');
         }
 
-        $session = $this->sessionRepository->find(
+        $session = $this->sessionRepository->findDomain(
             SessionId::fromString($reservation->sessionId())
         );
 
