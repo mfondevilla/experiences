@@ -2,6 +2,7 @@
 
 namespace App\Application\Session\CreateSession;
 
+use App\Domain\Experience\ExperienceId;
 use App\Domain\Session\Session;
 use App\Domain\Session\SessionId;
 use App\Domain\Session\SessionRepository;

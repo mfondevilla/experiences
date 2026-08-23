@@ -7,12 +7,17 @@ use App\Domain\Session\Session;
 use App\Domain\Session\SessionId;
 use App\Domain\Session\SessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class SessionDoctrineRepository implements SessionRepository
+class SessionDoctrineRepository extends ServiceEntityRepository implements SessionRepository
 {
-    public function __construct(private EntityManagerInterface $em)
+    public function __construct(
+        ManagerRegistry $registry,
+        private EntityManagerInterface $em,
+    )
     {
+        parent::__construct($registry, SessionModel::class);
     }
 
     public function save(Session $session): void
@@ -35,7 +40,7 @@ class SessionDoctrineRepository implements SessionRepository
         $this->em->flush();
     }
 
-    public function find(SessionId $id): ?Session
+   /* public function find(SessionId $id): ?Session
     {
         $model = $this->em->getRepository(SessionModel::class)
             ->find($id->value());
@@ -46,16 +51,21 @@ class SessionDoctrineRepository implements SessionRepository
 
         return $model->toDomain();
     }
-
+*/
     public function findByExperienceAndDate(ExperienceId $experienceId, \DateTimeImmutable $date): ?Session
     {
-        return $this->createQueryBuilder('s')
-            ->where('s.experienceId = :exp')
-            ->andWhere('DATE(s.startAt) = :day')
+        $qb = $this->createQueryBuilder('s');
+
+        $qb->where('s.experienceId = :exp')
+            ->andWhere('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
             ->setParameter('exp', $experienceId->value())
-            ->setParameter('day', $date->format('Y-m-d'))
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('start', $date->setTime(0, 0, 0))
+            ->setParameter('end', $date->setTime(23, 59, 59));
+
+        $model = $qb->getQuery()->getOneOrNullResult();
+
+        return $model?->toDomain();
     }
 
 }
