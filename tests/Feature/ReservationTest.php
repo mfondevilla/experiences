@@ -10,7 +10,7 @@ use App\Domain\Session\SessionRepository;
 
 class ReservationTest extends WebTestCase
 {
-     public function testCreateReservation(): void
+    public function testCreateReservation(): void
     {
         $client = static::createClient();
         $container = static::getContainer();
@@ -18,7 +18,7 @@ class ReservationTest extends WebTestCase
         /** @var SessionRepository $sessionRepository */
         $sessionRepository = $container->get(SessionRepository::class);
 
-        // 1️⃣ Crear una sesión válida para el test
+        //  Crear una sesión válida para el test
         $session = Session::create(
             experienceId: 'experience-123',
             startAt: '2026-09-25 19:00:00',
@@ -28,7 +28,7 @@ class ReservationTest extends WebTestCase
 
         $sessionRepository->save($session);
 
-        // 2️⃣ Ejecutar la petición al endpoint
+        //  Ejecutar la petición al endpoint
         $client->request(
             'POST',
             '/reservations',
@@ -42,11 +42,11 @@ class ReservationTest extends WebTestCase
             ])
         );
 
-        // 3️⃣ Validaciones HTTP
+        //  Validaciones HTTP
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(200);
 
-        // 4️⃣ Validar contenido JSON
+        // 4Validar contenido JSON
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('reservationId', $data);
